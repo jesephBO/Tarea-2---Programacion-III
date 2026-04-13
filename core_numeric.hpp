@@ -94,6 +94,80 @@ namespace core_numeric {
                 resultado = *it;
         return resultado;
         }
+        //Transform
+template <typename C, typename Func>
+requires Iterable<C> &&
+         Addable<std::decay_t<decltype(std::declval<Func>()(*std::begin(std::declval<C>())))>>
+auto transform_reduce(const C& cont, Func f) {
+
+    using std::begin;
+    using std::end;
+
+    using ResultType = std::decay_t<decltype(f(*begin(cont)))>;
+
+    auto it = begin(cont);
+
+    if (it == end(cont)) {
+        return ResultType{};
+    }
+
+    ResultType result = f(*it);
+    ++it;
+
+    for (; it != end(cont); ++it) {
+        result = result + f(*it);
+    }
+
+    return result;
+}
+
+// Sum
+template <typename... vars>
+requires (sizeof...(vars) > 0) && (Addable<vars> && ...)
+auto sum_variadic(vars... Vars) {
+    using S = std::common_type_t<vars...>;
+    return (S{} + ... + Vars);
+}
+//Mean
+template <typename... vars>
+requires (sizeof...(vars) > 0) &&
+         (Addable<vars> && ...) &&
+         Divisible<std::common_type_t<vars...>>
+auto mean_variadic(vars... Vars) {
+    using S = std::common_type_t<vars...>;
+
+    S s = (S{} + ... + Vars);
+
+    if constexpr (std::is_integral_v<S>) {
+        return static_cast<double>(s) / sizeof...(vars);
+    } else {
+        return s / static_cast<S>(sizeof...(vars));
+    }
+}
+
+// Variance
+    template <typename... vars>
+    requires (sizeof...(vars) > 0) &&
+             (Addable<vars> && ...) &&
+             Divisible<double>
+    auto variance_variadic(vars... Vars) {
+
+    double mean = (0.0 + ... + static_cast<double>(Vars)) / sizeof...(vars);
+
+    double var = (0.0 + ... + ((static_cast<double>(Vars) - mean) *
+                               (static_cast<double>(Vars) - mean)));
+
+    return var / sizeof...(vars);
+}
+
+//Max
+template <typename... vars>
+requires (sizeof...(vars) > 0) &&
+         Comparable<std::common_type_t<vars...>>
+auto max_variadic(vars... Vars) {
+    using S = std::common_type_t<vars...>;
+    return std::max({static_cast<S>(Vars)...});
+}
     }
 
 

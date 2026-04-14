@@ -12,7 +12,6 @@ add_executable(Tarea2
         testVariance.cpp
         testMean.cpp
         testSum.cpp
-        testParte2.cpp
         testSumVar.cpp
         testMeanVar.cpp
         testVarianceVar.cpp

@@ -6,7 +6,6 @@
 #include <cmath>
 #include <vector>
 #include <random>
-#include <functional>
 using namespace std;
 
 //Definimos el namespace core_numeric con las funciones plantilla y conceptos pertinentes
